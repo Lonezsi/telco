@@ -1,4 +1,4 @@
-package com.telco.integration.service;
+package com.telco.integration.service.normalization;
 
 import org.springframework.stereotype.Component;
 
@@ -11,9 +11,9 @@ public class SkuNormalizer {
      */
     public String normalize(String rawSku) {
         if (rawSku == null || rawSku.isBlank())
-            return "UNKNOWN";
+            return "UNKNOWN"; // TODO: reevaluate. this or null? hmm ._.
 
-        String clean = rawSku.replace("-", "").replace("_", "").toUpperCase();
+        String clean = rawSku.trim().replace("-", "").replace("_", "").toUpperCase();
 
         // 'P' -> 'SKU'
         if (clean.startsWith("P") && !clean.startsWith("PRO")) {
