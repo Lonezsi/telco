@@ -22,4 +22,9 @@ public interface RawFeedItem {
     Instant getUpdatedAt();
 
     String getSourceIdentifier();
+
+    static RawFeedItemDto.RawFeedItemDtoBuilder builder() {
+        return RawFeedItemDto.builder();
+    }
+
 }

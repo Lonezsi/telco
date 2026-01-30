@@ -23,6 +23,6 @@ tax:
 
 feeds:
   csv:
-    path: ./data/incompatible_feeds_products.csv
+    path: "../data/incompatible_feeds_products.csv"
   json:
-    path: ./data/incompatible_feeds_products.json
+    path: "../data/incompatible_feeds_products.json"
