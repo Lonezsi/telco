@@ -42,7 +42,7 @@ public class ProductIntegrationService {
 
             if ("UNKNOWN".equals(normalizedSku)) {
                 String errorSku = "UNKNOWN-" + UUID.randomUUID().toString().substring(0, 8);
-                repository.save(mapToProduct(item, errorSku));
+                repository.save(Objects.requireNonNull(mapToProduct(item, errorSku)));
                 continue;
             }
 
@@ -54,7 +54,7 @@ public class ProductIntegrationService {
             });
         }
 
-        repository.saveAll(mergedProducts.values());
+        repository.saveAll(Objects.requireNonNull(mergedProducts.values()));
         log.info("Merged into {} unified products", mergedProducts.size());
     }
 
@@ -75,18 +75,20 @@ public class ProductIntegrationService {
         if (finalPrice == null)
             errors.add("Missing Price");
 
-        return Product.builder()
-                .sku(sku)
-                .name(item.getName() != null ? item.getName() : "UNKNOWN")
-                .manufacturer(item.getManufacturer())
-                .finalPriceHuf(finalPrice)
-                .stock(item.getStock())
-                .ean(item.getEan())
-                .updatedAt(item.getUpdatedAt())
-                .source(item.getSourceIdentifier())
-                .valid(errors.isEmpty())
-                .validationErrors(String.join(", ", errors))
-                .build();
+        // double promising no nulls rn
+        return Objects.requireNonNull(
+                Product.builder()
+                        .sku(sku)
+                        .name(item.getName() != null ? item.getName() : "UNKNOWN")
+                        .manufacturer(item.getManufacturer())
+                        .finalPriceHuf(finalPrice)
+                        .stock(item.getStock())
+                        .ean(item.getEan())
+                        .updatedAt(item.getUpdatedAt())
+                        .source(item.getSourceIdentifier())
+                        .valid(errors.isEmpty())
+                        .validationErrors(String.join(", ", errors))
+                        .build());
     }
 
     private Product mergeProducts(Product existing, Product candidate) {
