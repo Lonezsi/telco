@@ -1,0 +1,28 @@
+spring:
+  application:
+    name: integration
+  datasource:
+    url: jdbc:h2:mem:telco
+    driverClassName: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  h2:
+    console:
+      enabled: true
+
+tax:
+  vat:
+    multiplier: 1.27
+
+feeds:
+  csv:
+    path: ./data/incompatible_feeds_products.csv
+  json:
+    path: ./data/incompatible_feeds_products.json
