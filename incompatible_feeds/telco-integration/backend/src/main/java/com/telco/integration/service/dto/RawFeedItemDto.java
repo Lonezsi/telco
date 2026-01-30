@@ -35,6 +35,9 @@ public class RawFeedItemDto implements RawFeedItem {
     // Augment Lombok-generated builder to support the `isGrossPrice(...)` call-site
     // used elsewhere
     public static class RawFeedItemDtoBuilder {
+        /**
+         * bridges the gap between CSV 'gross_price' boolean and the builder's field
+         */
         public RawFeedItemDtoBuilder isGrossPrice(boolean gross) {
             this.grossPrice = gross;
             return this;

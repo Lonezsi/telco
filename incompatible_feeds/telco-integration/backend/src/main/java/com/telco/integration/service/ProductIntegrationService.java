@@ -75,20 +75,18 @@ public class ProductIntegrationService {
         if (finalPrice == null)
             errors.add("Missing Price");
 
-        // double promising no nulls rn
-        return Objects.requireNonNull(
-                Product.builder()
-                        .sku(sku)
-                        .name(item.getName() != null ? item.getName() : "UNKNOWN")
-                        .manufacturer(item.getManufacturer())
-                        .finalPriceHuf(finalPrice)
-                        .stock(item.getStock())
-                        .ean(item.getEan())
-                        .updatedAt(item.getUpdatedAt())
-                        .source(item.getSourceIdentifier())
-                        .valid(errors.isEmpty())
-                        .validationErrors(String.join(", ", errors))
-                        .build());
+        return Product.builder()
+                .sku(sku)
+                .name(item.getName() != null ? item.getName() : "UNKNOWN")
+                .manufacturer(item.getManufacturer())
+                .finalPriceHuf(finalPrice)
+                .stock(item.getStock())
+                .ean(item.getEan())
+                .updatedAt(item.getUpdatedAt())
+                .source(item.getSourceIdentifier())
+                .valid(errors.isEmpty())
+                .validationErrors(String.join(", ", errors))
+                .build();
     }
 
     private Product mergeProducts(Product existing, Product candidate) {
@@ -96,6 +94,7 @@ public class ProductIntegrationService {
         Product winner;
         Product loser;
 
+        // strategy: take the most recently updated
         if (candidate.getUpdatedAt() != null &&
                 (existing.getUpdatedAt() == null || candidate.getUpdatedAt().isAfter(existing.getUpdatedAt()))) {
             winner = candidate;
@@ -105,6 +104,7 @@ public class ProductIntegrationService {
             loser = candidate;
         }
 
+        // fill missing fields from the loser if needed
         if (winner.getManufacturer() == null)
             winner.setManufacturer(loser.getManufacturer());
         if (winner.getStock() == null)

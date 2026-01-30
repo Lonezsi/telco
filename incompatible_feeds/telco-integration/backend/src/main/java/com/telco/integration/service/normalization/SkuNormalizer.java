@@ -11,11 +11,11 @@ public class SkuNormalizer {
      */
     public String normalize(String rawSku) {
         if (rawSku == null || rawSku.isBlank())
-            return "UNKNOWN"; // TODO: reevaluate. this or null? hmm ._.
+            return "UNKNOWN";
 
         String clean = rawSku.trim().replace("-", "").replace("_", "").toUpperCase();
 
-        // 'P' -> 'SKU'
+        // 'P' -> 'SKU', 'PRO' stays
         if (clean.startsWith("P") && !clean.startsWith("PRO")) {
             return "SKU" + clean.substring(1);
         }
