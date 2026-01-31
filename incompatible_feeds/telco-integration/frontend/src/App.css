@@ -221,6 +221,12 @@ body {
   padding: 14px;
   border-radius: 10px;
   border: 1px solid var(--border);
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.issue-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 6px 18px rgba(239,68,68,0.12);
 }
 
 .sk {
@@ -397,7 +403,7 @@ body {
 
 .theme-pill.on .pill-handle {
   transform: translateY(-50%) translateX(18px);
-  background: var(--primary);
+  background: var(--text);
 }
 
 .theme-control {

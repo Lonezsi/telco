@@ -192,7 +192,7 @@ const App: React.FC = () => {
       <header className="header">
 
         <div className="brand">
-          <Package size={26} />
+          <img src="/icon.svg" alt="Telco Integration" width="64" height="64" />
           <div>
             <h1>Telco Integration</h1>
             <p>Unified Product View</p>
