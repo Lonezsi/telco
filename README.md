@@ -16,6 +16,8 @@
 - run `cd backend && ./mvnw spring-boot:run`
 - then run `cd frontend && npm install && npm start`
 
+OR run with docker! `\telco-integration\docker-compose.yml`
+
 ### Backend
 
 - in `/backend`.
