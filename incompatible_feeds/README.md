@@ -21,7 +21,7 @@
 - in `/backend`.
 - run: `./mvnw spring-boot:run`
 - url: `http://localhost:8080/products`
-- uses: `/data` which gets fed into the system at start
+- uses: `/data` folder from which json and csv gets fed into the system at start
 
 ## API Specification
 

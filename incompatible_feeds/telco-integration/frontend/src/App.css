@@ -26,7 +26,7 @@ body {
 }
 
 .app-root {
-  max-width: 1300px;
+  max-width: min(1200px, 100%);
   margin: 0 auto;
   padding: 28px;
 }
@@ -101,7 +101,7 @@ body {
 }
 
 .table-card, .stats, .issues {
-  width: 100%;
+  width: 99%;
   min-width: 326px;
 }
 
@@ -307,20 +307,24 @@ body {
 }
 
 .toolbar {
+  max-width: 100%;
   display: flex;
   gap: 12px;
   align-items: center;
   padding: 6px 8px;
+  flex: 1;
 }
 
 .search {
   position: relative;
   display: flex;
   align-items: center;
+  flex: 1;
+  min-width: 150px;
 }
 
 .search input {
-  width: 280px;
+  width: 100%;
   height: 36px;
   padding: 8px 12px 8px 36px;
   border-radius: 15px;
@@ -338,10 +342,6 @@ body {
 
   .stats {
     grid-template-columns: repeat(2, 1fr);
-  }
-
-  .search input {
-    width: 140px;
   }
 
   .table {
@@ -398,6 +398,39 @@ body {
   outline: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
   outline-offset: 2px;
 }
+
+.refresh-btn {
+  display: block;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid transparent;
+  background: var(--card);
+  border: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.refresh-btn svg {
+  top: 0px;
+  left: -8px;
+  position: relative;
+  color: var(--muted);
+  transition: opacity 120ms ease;
+}
+
+.refresh-btn:focus {
+  outline: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  outline-offset: 2px;
+}
+
+.refresh-btn:hover {
+  background: color-mix(in srgb, var(--card) 92%, transparent);
+  color: var(--text);
+}
+
+.refresh-btn svg { opacity: 0.95; }
 
 .theme-pill {
   display: inline-flex;

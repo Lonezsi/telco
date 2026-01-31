@@ -7,7 +7,8 @@ import {
   Package,
   Filter,
   Moon,
-  Sun
+  Sun,
+  RefreshCw
 } from 'lucide-react';
 import type { Product } from './types';
 import { EllipsisTd } from './components/EllipsisTd';
@@ -88,26 +89,24 @@ const App: React.FC = () => {
     }
   }, [dark]);
 
-  // fetch once filter in-memory
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        // if Docker use backend port on localhost
-        const url = import.meta.env.PROD ? 'http://localhost:8080/products' : '/products';
-        const res = await axios.get<Product[]>(url);
-        
-        setProducts(Array.isArray(res.data) ? res.data : []);
-      } catch (e) {
-        console.error(e);
-        setProducts([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // fetch helper (used for initial load and manual refresh)
+  const fetchProducts = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      // if Docker use backend port on localhost
+      const url = import.meta.env.PROD ? 'http://localhost:8080/products' : '/products';
+      const res = await axios.get<Product[]>(url);
 
-    fetchData();
+      setProducts(Array.isArray(res.data) ? res.data : []);
+    } catch (e) {
+      console.error(e);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
   }, []);
+
+  useEffect(() => { fetchProducts(); }, [fetchProducts]);
 
   const changeSortAny = (key: 'status'|'sku'|'name'|'manufacturer'|'finalPriceHuf'|'stock'|'source') => {
     if (sortKey === key) {
@@ -193,6 +192,27 @@ const App: React.FC = () => {
   const invalid = Array.isArray(products) ? products.filter(p => !p.valid) : [];
   const sources = Array.isArray(products) ? new Set(products.map(p => p.source)).size : 0;
 
+  // auto-refresh once if the filtered result is empty (to recover from transient backend issues)
+  const [autoRefreshCount, setAutoRefreshCount] = useState(0);
+
+  // periodic refresh: 0 = off, otherwise interval in seconds
+  const [refreshEvery] = useState<number>(0);
+
+  useEffect(() => {
+    if (!refreshEvery || refreshEvery < 1) return;
+    const id = setInterval(() => {
+      fetchProducts();
+    }, refreshEvery * 1000);
+    return () => clearInterval(id);
+  }, [refreshEvery, fetchProducts]);
+
+  useEffect(() => {
+    if (!loading && sortedProducts.length === 0 && autoRefreshCount < 1) {
+      setAutoRefreshCount(c => c + 1);
+      fetchProducts();
+    }
+  }, [loading, sortedProducts.length, autoRefreshCount]);
+
   const skeletonRows = Array.from({ length: 8 });
 
   return (
@@ -221,6 +241,15 @@ const App: React.FC = () => {
               onChange={e => setFilter(e.target.value)}
             />
           </div>
+
+          <button
+            className="refresh-btn"
+            onClick={() => fetchProducts()}
+            title="Refresh table"
+            aria-label="Refresh table"
+          >
+            <RefreshCw size={16} />
+          </button>
 
           <div className="valid-control">
             <label className="checkbox-wrap">
