@@ -97,9 +97,7 @@ body {
   background: var(--card);
   border-radius: 16px;
   border: 1px solid var(--border);
-  
   overflow: visible;
-  min-height: 480px;
 }
 
 .table-card, .stats, .issues {
