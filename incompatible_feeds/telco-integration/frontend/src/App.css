@@ -432,6 +432,20 @@ body {
 
 .refresh-btn svg { opacity: 0.95; }
 
+.refresh-btn.spinning svg {
+  animation: spin 800ms linear infinite;
+  transform-origin: 50% 50%;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.refresh-btn[disabled] {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .theme-pill {
   display: inline-flex;
   align-items: center;

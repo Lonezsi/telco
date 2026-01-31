@@ -89,6 +89,8 @@ const App: React.FC = () => {
     }
   }, [dark]);
 
+  const [refreshing, setRefreshing] = useState(false);
+
   // fetch helper (used for initial load and manual refresh)
   const fetchProducts = React.useCallback(async () => {
     setLoading(true);
@@ -196,15 +198,21 @@ const App: React.FC = () => {
   const [autoRefreshCount, setAutoRefreshCount] = useState(0);
 
   // periodic refresh: 0 = off, otherwise interval in seconds
-  const [refreshEvery] = useState<number>(0);
+  const [refreshEvery] = useState<number>(3);
 
   useEffect(() => {
     if (!refreshEvery || refreshEvery < 1) return;
+
+    // only refresh if there is NO data
+    if (products.length > 0) return;
+
     const id = setInterval(() => {
       fetchProducts();
     }, refreshEvery * 1000);
+
     return () => clearInterval(id);
-  }, [refreshEvery, fetchProducts]);
+  }, [products.length, refreshEvery, fetchProducts]);
+
 
   useEffect(() => {
     if (!loading && sortedProducts.length === 0 && autoRefreshCount < 1) {
@@ -243,10 +251,18 @@ const App: React.FC = () => {
           </div>
 
           <button
-            className="refresh-btn"
-            onClick={() => fetchProducts()}
+            className={`refresh-btn ${refreshing ? 'spinning' : ''}`}
+            onClick={async () => {
+              setRefreshing(true);
+              try {
+                await fetchProducts();
+              } finally {
+                setRefreshing(false);
+              }
+            }}
             title="Refresh table"
             aria-label="Refresh table"
+            disabled={loading || refreshing}
           >
             <RefreshCw size={16} />
           </button>
@@ -289,7 +305,7 @@ const App: React.FC = () => {
 
         <Stat icon={<Package size={18} />} label="Total" value={products.length} />
         <Stat icon={<CheckCircle2 size={18} />} label="Valid" value={products.length - invalid.length} />
-        <Stat icon={<AlertTriangle size={18} />} label="Invalid" value={invalid.length} danger />
+        <Stat icon={<AlertTriangle size={18} />} label="Invalid" value={invalid.length} danger={invalid.length > 0} />
         <Stat icon={<Filter size={18} />} label="Sources" value={sources} />
 
       </section>
