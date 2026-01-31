@@ -23,6 +23,7 @@ tax:
 
 feeds:
   csv:
-    path: "../data/incompatible_feeds_products.csv"
+    # uses /app/data in Docker, or ../data locally
+    path: "${DATA_DIR:../data}/incompatible_feeds_products.csv"
   json:
-    path: "../data/incompatible_feeds_products.json"
+    path: "${DATA_DIR:../data}/incompatible_feeds_products.json"

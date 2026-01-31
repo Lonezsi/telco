@@ -6,9 +6,8 @@ export default defineConfig({
   server: {
     proxy: {
       '/products': {
-        target: 'http://localhost:8080',
-        changeOrigin: true,
-        secure: false,
+        target: process.env.DOCKER_RUN ? 'http://backend:8080' : 'http://localhost:8080',
+        changeOrigin: true
       }
     }
   }

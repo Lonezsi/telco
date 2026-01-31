@@ -13,7 +13,7 @@ import type { Product } from './types';
 import { EllipsisTd } from './components/EllipsisTd';
 import './App.css';
 
-/* ---------------- TYPES ---------------- */
+/* _________________ TYPES _________________ */
 
 type StatProps = {
   icon: React.ReactNode;
@@ -34,7 +34,7 @@ type TooltipProps = {
   children: React.ReactNode;
 };
 
-/* ---------------- SMALL COMPONENTS ---------------- */
+/* _________________ SMALL COMPONENTS _________________ */
 
 const Stat: React.FC<StatProps> = ({ icon, label, value, danger }) => (
   <div className={`stat ${danger ? 'danger' : ''}`}>
@@ -57,7 +57,7 @@ const Tooltip: React.FC<TooltipProps> = ({ text, children }) => (
   </div>
 );
 
-/* ---------------- MAIN APP ---------------- */
+/* _________________ MAIN APP _________________ */
 
 const App: React.FC = () => {
 
@@ -93,10 +93,14 @@ const App: React.FC = () => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await axios.get<Product[]>('/products');
-        setProducts(res.data);
+        // if Docker use backend port on localhost
+        const url = import.meta.env.PROD ? 'http://localhost:8080/products' : '/products';
+        const res = await axios.get<Product[]>(url);
+        
+        setProducts(Array.isArray(res.data) ? res.data : []);
       } catch (e) {
         console.error(e);
+        setProducts([]);
       } finally {
         setLoading(false);
       }
@@ -116,6 +120,12 @@ const App: React.FC = () => {
 
   const sortedProducts = useMemo(() => {
     // filter in-memory
+
+    if (!Array.isArray(products)) {
+      console.error("Products is not an array! Value:", products);
+      return [];
+    }
+
     const q = filter.trim().toLowerCase();
     let arr = products.filter(p => {
       if (onlyValid && !p.valid) return false;
@@ -180,8 +190,8 @@ const App: React.FC = () => {
     };
   }, [sortedProducts.length, loading]);
 
-  const invalid = products.filter(p => !p.valid);
-  const sources = new Set(products.map(p => p.source)).size;
+  const invalid = Array.isArray(products) ? products.filter(p => !p.valid) : [];
+  const sources = Array.isArray(products) ? new Set(products.map(p => p.source)).size : 0;
 
   const skeletonRows = Array.from({ length: 8 });
 
@@ -204,13 +214,25 @@ const App: React.FC = () => {
           <div className="search">
             <Search size={18} />
             <input
+              type="text"
+              id='search'
               placeholder="Search SKU or name…"
               value={filter}
               onChange={e => setFilter(e.target.value)}
             />
           </div>
 
-          {/* Sort by clicking the table headers */}
+          <div className="valid-control">
+            <label className="checkbox-wrap">
+              <input
+                id="valid"
+                type="checkbox"
+                checked={onlyValid}
+                onChange={e => setOnlyValid(e.target.checked)}
+              />
+              <div className="valid-label">Valid only</div>
+            </label>
+          </div>
 
           <div className="theme-control">
             <button
@@ -230,16 +252,6 @@ const App: React.FC = () => {
               {dark ? <><Moon size={12} /> Dark Mode</> : <><Sun size={12} /> Light Mode</>}
             </div>
           </div>
-
-          <label className="toggle">
-            <input
-              type="checkbox"
-              checked={onlyValid}
-              onChange={e => setOnlyValid(e.target.checked)}
-            />
-            Valid only
-          </label>
-
         </div>
       </header>
 
@@ -258,15 +270,9 @@ const App: React.FC = () => {
 
         <div className="table-inner" ref={tableInnerRef as any}>
           <table className="table">
-          <colgroup>
-            <col style={{ width: 60 }} />   {/* Status */}
-            <col style={{ width: 140 }} />  {/* SKU */}
-            <col style={{ minWidth: 140 }}/>{/* NAME FLEX */}
-            <col style={{ width: 160 }} />  {/* Manufacturer */}
-            <col style={{ width: 140 }} />  {/* Price */}
-            <col style={{ width: 90 }} />   {/* Stock */}
-            <col style={{ width: 110 }} />  {/* Source */}
-          </colgroup>
+          {/*hydration warns me to do this instead of the more readable top down commenting*/}
+                           {/* Status            SKU                           Name FLEX                       Manufacturer                   Price                         Stock                        Source*/}
+          <colgroup><col style={{ width: 80 }} /><col style={{ width: 140 }} /><col style={{ minWidth: 140 }}/><col style={{ width: 160 }} /><col style={{ width: 140 }} /><col style={{ width: 90 }} /><col style={{ width: 110 }} /></colgroup>
 
           <thead>
             <tr>
@@ -346,8 +352,8 @@ const App: React.FC = () => {
               </tr>
             ))}
 
-            {!loading && products.length === 0 && (
-              <tr>
+            {!loading && sortedProducts.length === 0 && (
+              <tr className="empty-row">
                 <EllipsisTd colSpan={7} className="empty">
                   <Filter size={40} />
                   <p>No products match filter</p>
@@ -368,7 +374,7 @@ const App: React.FC = () => {
 
           <h2>
             <AlertTriangle size={18} />
-            Data Issues ({invalid.length})
+            All Data Issues ({invalid.length})
           </h2>
 
           <div className="issue-grid">
